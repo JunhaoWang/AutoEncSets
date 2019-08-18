@@ -21,7 +21,7 @@ class IndexIterator(object):
         self.epochs = epochs
         self.iters_left = len(self)
         self.sampler = sampler
-        if n_workers > 0:
+        if False: #n_workers > 0:
             self.batches_remaining = Value('i', len(self))
             self.index_queue = Queue()
             self.workers = [Process(target=_worker_fn, args=(self.batches_remaining,
@@ -39,10 +39,11 @@ class IndexIterator(object):
         return self
     
     def _get_batch(self):
-        if self.n_workers > 0:
-            return self.index_queue.get()
-        else:
-            return self.sampler()
+        return self.sampler()
+        # if self.n_workers > 0:
+        #     return self.index_queue.get()
+        # else:
+        #     return self.sampler()
         
     def __next__(self):
         if self.iters_left > 0:
@@ -56,6 +57,7 @@ class IndexIterator(object):
     next = __next__
         
     def _shutdown_workers(self):
+        return
         if self.n_workers > 0:
             for p in self.workers:
                 if p is not None:
@@ -69,7 +71,7 @@ class IndexIterator(object):
 
 if __name__ == '__main__':
     import recsys
-    from samplers import UniformSampler
+    from .samplers import UniformSampler
     
     data = recsys.ml100k(0.)
     sampler = UniformSampler(80000, data)

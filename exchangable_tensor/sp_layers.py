@@ -121,9 +121,9 @@ class SparsePool(nn.Module):
             self.norm = self.norm.to(index.device)
             self.out_size = out_size
         
-        self.norm = torch.zeros_like(self.norm.to(index.device)).index_add_(0, index,
+        self.norm = torch.zeros_like(self.norm.to(index.device)).index_add_(0, index.long(),
                                          torch.ones_like(index.float())) + self.eps
-        
+
     def zero_cache(self):
         '''
         We incrementally compute the pooled representation in batches, so we need a way of clearing
@@ -154,9 +154,9 @@ class SparsePool(nn.Module):
 
     def mean(self, input, index, ind_max):
         output = torch.zeros((ind_max, input.shape[1])).to(input.device).index_add_(0, 
-                                                          index, 
+                                                          index.long(),
                                                           input)
-        norm = torch.zeros(ind_max).to(input.device).index_add_(0, index, torch.ones_like(index).float()) + self.eps
+        norm = torch.zeros(ind_max).to(input.device).index_add_(0, index.long(), torch.ones_like(index).float()) + self.eps
         
         return output / norm[:, None].float()
     
@@ -201,7 +201,7 @@ class SparsePool(nn.Module):
 
         if keep_dims:
             return torch.index_select(output,
-                                      0, index)
+                                      0, index.long())
         else:
             return output
         

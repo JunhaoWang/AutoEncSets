@@ -144,8 +144,8 @@ class FactorizedAutoencoder(nn.Module):
         encoded = self.enc(input)
         row_mean = self.pool_row(encoded)
         col_mean = self.pool_col(encoded)
-        embeddings = torch.cat([torch.index_select(row_mean, 0, self.index_eval[:, 0]), 
-                                torch.index_select(col_mean, 0, self.index_eval[:, 1])], dim=1)
+        embeddings = torch.cat([torch.index_select(row_mean, 0, self.index_eval[:, 0].long()),
+                                torch.index_select(col_mean, 0, self.index_eval[:, 1].long())], dim=1)
         output = self.dec(embeddings)
         return output
 
@@ -174,7 +174,7 @@ values = prep_data(torch.arange(1,6)[None,:])
 softmax = torch.nn.Softmax(dim=1)
 def expected_mse(output, target):
     output = softmax(output)
-    y = (output * values).sum(dim=1)
+    y = (output.float() * values.float()).sum(dim=1)
     return mse(y, target)
 
 if args.sampler == "uniform":
